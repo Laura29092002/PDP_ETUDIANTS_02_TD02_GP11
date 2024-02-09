@@ -25,8 +25,20 @@ DHT_Unified dht(SENSOR, DHTTYPE);
 // ...
 // ...
 
-char ssid[] = "<YourNetworkName>";
-char pass[] = "<YourPassword>";
+char ssid[] = "Laura";
+char pass[] = "goki3811";
+
+BLYNK_WRITE(V2)
+{
+  int pinValue = param.asInt(); // assigning incoming value from pin V0 to a variable
+  Serial.print("Received value from Blynk: ");
+  Serial.println(pinValue);
+  digitalWrite(LED,pinValue);
+  // Delay is only there so that we get a chance to see the LED value properly.
+  delay(1000);
+}
+
+
 
 void setup() {
   // Setup pins
@@ -40,6 +52,7 @@ void setup() {
   // Au début du setup, après la connexion série
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
   Blynk.run();
+  Blynk.syncVirtual(V2);
 
   // begin the Blynk session
   // ...
@@ -61,6 +74,9 @@ void setup() {
     Serial.print(event.temperature);
     Serial.println(F("°C"));
     temp_measure = event.temperature;
+
+    // Send temperature to Blynk
+    Blynk.virtualWrite(V1, event.temperature);
   }
 
   // Get humidity event and print its value.
@@ -73,6 +89,9 @@ void setup() {
     Serial.print(event.relative_humidity);
     Serial.println(F("%"));
     relative_humidity_measure = event.relative_humidity;
+
+    // Send humidity to Blynk
+    Blynk.virtualWrite(V0, event.relative_humidity);
   }
 
   // Send data to Blynk
